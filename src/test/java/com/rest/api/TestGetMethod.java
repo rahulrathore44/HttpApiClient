@@ -5,6 +5,7 @@ import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.rest.api.httpclient.HttpApiAsyncClient;
 import com.rest.api.httpclient.HttpApiClient;
 import com.rest.api.httpclient.HttpApiResponce;
 
@@ -27,5 +28,15 @@ public class TestGetMethod {
 		System.out.println(responce.getResponceContent());
 		Assert.assertTrue("Status Code is not Proper", responce.getStatusCode() == HttpStatus.SC_OK || responce.getStatusCode() == HttpStatus.SC_NOT_FOUND);
 	}
+	
+	@Test
+	public void testGetAsync() {
+		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords");
+		System.out.println(response.getStatusCode());
+		System.out.println(response.getResponceContent());
+		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+	}
+	
+	
 
 }

@@ -42,9 +42,8 @@ public class HttpApiClient {
 		try {
 			return Get(new URI(uri));
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
-		throw new RuntimeException("Cannot execute GET method");
 	}
 	
 	public static HttpApiResponce Get(URI uri) {
@@ -65,9 +64,8 @@ public class HttpApiClient {
 		try {
 			return Post(new URI(uri),content);
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
-		throw new RuntimeException("Cannot execute POST method");
 	}
 	
 	public static HttpApiResponce Post(URI uri,Object content) {
@@ -89,9 +87,8 @@ public class HttpApiClient {
 		try {
 			return Put(new URI(uri),content);
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
-		throw new RuntimeException("Cannot execute PUT method");
 	}
 	
 	public static HttpApiResponce Put(URI uri,Object content) {
@@ -113,9 +110,8 @@ public class HttpApiClient {
 		try {
 			return Delete(new URI(uri));
 		} catch (URISyntaxException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
-		throw new RuntimeException("Cannot execute DELETE method");
 	}
 	
 	public static HttpApiResponce Delete(URI uri) {
