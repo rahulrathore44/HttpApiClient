@@ -9,7 +9,16 @@ import com.rest.api.httpclient.HttpApiAsyncClient;
 import com.rest.api.httpclient.HttpApiClient;
 import com.rest.api.httpclient.HttpApiResponce;
 
-
+class GetLookup extends Thread{
+	
+	@Override
+	public void run() {
+		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords");
+		System.out.println(response.getStatusCode());
+		System.out.println(response.getResponceContent());
+		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+	}
+}
 
 public class TestGetMethod {
 	
@@ -35,6 +44,16 @@ public class TestGetMethod {
 		System.out.println(response.getStatusCode());
 		System.out.println(response.getResponceContent());
 		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+	}
+	
+	@Test
+	public void testGetAsyncWithMultipleThread() throws InterruptedException {
+		GetLookup lookup[] = new GetLookup[20];
+		for (int i = 0; i < lookup.length; i++) {
+			lookup[i] = new GetLookup();
+			lookup[i].start();
+			lookup[i].join();
+		}
 	}
 	
 	
