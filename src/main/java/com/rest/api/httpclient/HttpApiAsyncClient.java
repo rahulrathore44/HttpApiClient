@@ -2,23 +2,26 @@ package com.rest.api.httpclient;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.FileEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
+import org.apache.http.message.BasicHeader;
 
 public class HttpApiAsyncClient {
 	
@@ -38,32 +41,19 @@ public class HttpApiAsyncClient {
 		
 	}
 	
-	public static HttpApiResponce Get(String uri) {
-		try {
-			return Get(new URI(uri));
-		} catch (Exception e) {
-			throw new RuntimeException(e.getMessage(), e.getCause());
+	private static Header[] getHeaders(Map<String, String> customHeader) {
+		BasicHeader[] header = new BasicHeader[customHeader.size()];
+		int i = 0;
+		for(String key : customHeader.keySet()){
+			header[i++] = new BasicHeader(key, customHeader.get(key));
 		}
+		return header;
 	}
 	
-	public static HttpApiResponce Get(URI uri) throws InterruptedException, ExecutionException {
-		Future<HttpResponse> httpResponce = null;
-		HttpUriRequest get = RequestBuilder.get(uri).build();
-		
+	private static HttpApiResponce performRequest(Future<HttpResponse> httpResponce,HttpUriRequest method) throws InterruptedException, ExecutionException {
 		try(CloseableHttpAsyncClient httpClient = getHttpAsyncClient()) {
 			httpClient.start();
-			httpResponce = httpClient.execute(get, new FutureCallback<HttpResponse>() {
-				@Override
-				public void failed(Exception ex) {
-				}
-				@Override
-				public void completed(HttpResponse result) {
-					System.out.println("Current : " + Thread.currentThread().getId());
-				}
-				@Override
-				public void cancelled() {
-				}
-			});
+			httpResponce = httpClient.execute(method, null);
 			String responceContent = getBasicResponceHandler().handleResponse(httpResponce.get());
 			return new HttpApiResponce(httpResponce.get().getStatusLine().getStatusCode(), responceContent);
 		} catch (Exception e) {
@@ -73,19 +63,81 @@ public class HttpApiAsyncClient {
 		}
 	}
 	
-	public static HttpApiResponce Post(URI uri,Object content) throws InterruptedException, ExecutionException {
+	public static HttpApiResponce Get(String uri,Map<String, String> customHeader) {
+		try {
+			return Get(new URI(uri),customHeader);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		}
+	}
+	
+	public static HttpApiResponce Get(URI uri,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
+		Future<HttpResponse> httpResponce = null;
+		HttpUriRequest get = RequestBuilder.get(uri).build();
+		
+		if(customHeader != null)
+			get.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponce, get);
+	}
+	
+	
+	public static HttpApiResponce Post(String uri,Object content,Map<String, String> customHeader) {
+		try {
+			return Post(new URI(uri),content,customHeader);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		}
+	}
+	
+	public static HttpApiResponce Post(URI uri,Object content,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
 		Future<HttpResponse> httpResponse = null;
 		HttpPost post = new HttpPost(uri);
 		post.setEntity(getHttpEntityType(content));
-		try(CloseableHttpAsyncClient httpClient = getHttpAsyncClient()) {
-		httpResponse = httpClient.execute(post, null);
-		String responceContent = getBasicResponceHandler().handleResponse(httpResponse.get());
-		return new HttpApiResponce(httpResponse.get().getStatusLine().getStatusCode(), responceContent);
+		
+		if(customHeader != null)
+			post.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponse, post);
+	}
+	
+	public static HttpApiResponce Put(String uri,Object content,Map<String, String> customHeader) {
+		try {
+			return Put(new URI(uri),content,customHeader);
 		} catch (Exception e) {
-			if(e instanceof HttpResponseException)
-				return new HttpApiResponce(httpResponse.get().getStatusLine().getStatusCode(), e.getMessage());
 			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
+	}
+	
+	public static HttpApiResponce Put(URI uri,Object content,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
+		Future<HttpResponse> httpResponce = null;
+		HttpPut put = (HttpPut)RequestBuilder.put(uri).build();
+		put.setEntity(getHttpEntityType(content));
+		
+		if(customHeader != null)
+			put.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponce, put);
+		
+	}
+	
+	
+	public static HttpApiResponce Delete(String uri,Map<String, String> customHeader) {
+		try {
+			return Delete(new URI(uri),customHeader);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		}
+	}
+	
+	public static HttpApiResponce Delete(URI uri,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
+		Future<HttpResponse> httpResponce = null;
+		HttpUriRequest delete = RequestBuilder.delete(uri).build();
+		
+		if(customHeader != null)
+			delete.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponce, delete);
 	}
 
 }

@@ -1,6 +1,8 @@
 package com.rest.api;
 
 
+import java.util.HashMap;
+
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,7 +18,7 @@ class GetLookup extends Thread{
 	
 	@Override
 	public void run() {
-		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords");
+		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords",null);
 		System.out.println(response.getStatusCode());
 		System.out.println(response.getResponceContent());
 		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
@@ -27,7 +29,10 @@ public class TestGetMethod {
 	
 	@Test
 	public void testGet() {
-		HttpApiResponce response = HttpApiClient.Get("http://localhost:8080/landlords");
+		@SuppressWarnings("serial")
+		HttpApiResponce response = HttpApiClient.Get("http://localhost:8080/landlords",new HashMap<String, String>(){{
+			put("test", "One");
+		}});
 		System.out.println(response.getStatusCode());
 		System.out.println(response.getResponceContent());
 		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
@@ -35,7 +40,7 @@ public class TestGetMethod {
 	
 	@Test
 	public void testGetWithId() {
-		HttpApiResponce responce = HttpApiClient.Get("http://localhost:8080/landlords/rkPqhyJW");
+		HttpApiResponce responce = HttpApiClient.Get("http://localhost:8080/landlords/rkPqhyJW",null);
 		System.out.println(responce.getStatusCode());
 		System.out.println(responce.getResponceContent());
 		Assert.assertTrue("Status Code is not Proper", responce.getStatusCode() == HttpStatus.SC_OK || responce.getStatusCode() == HttpStatus.SC_NOT_FOUND);
@@ -43,7 +48,10 @@ public class TestGetMethod {
 	
 	@Test
 	public void testGetAsync() {
-		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords");
+		@SuppressWarnings("serial")
+		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords",new HashMap<String, String>(){{
+			put("test", "One");
+		}});
 		System.out.println(response.getStatusCode());
 		System.out.println(response.getResponceContent());
 		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
@@ -61,7 +69,7 @@ public class TestGetMethod {
 	
 	@Test
 	public void testGetWithDeserialization() {
-		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords");
+		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords",null);
 		System.out.println(response.getStatusCode());
 		System.out.println(response.getResponceContent());
 		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());

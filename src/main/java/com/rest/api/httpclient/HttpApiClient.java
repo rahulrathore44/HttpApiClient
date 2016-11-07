@@ -3,8 +3,11 @@ package com.rest.api.httpclient;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -19,6 +22,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
 
 
 public class HttpApiClient {
@@ -38,19 +42,19 @@ public class HttpApiClient {
 		
 	}
 	
-	public static HttpApiResponce Get(String uri) {
-		try {
-			return Get(new URI(uri));
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e.getMessage(), e.getCause());
+	private static Header[] getHeaders(Map<String, String> customHeader) {
+		BasicHeader[] header = new BasicHeader[customHeader.size()];
+		int i = 0;
+		for(String key : customHeader.keySet()){
+			header[i++] = new BasicHeader(key, customHeader.get(key));
 		}
+		return header;
 	}
 	
-	public static HttpApiResponce Get(URI uri) {
-		CloseableHttpResponse httpResponce = null;
-		HttpGet get = new HttpGet(uri);
+	
+	private static HttpApiResponce performRequest(HttpResponse httpResponce,HttpUriRequest method){
 		try(CloseableHttpClient client = getCloseableHttpClient()) {
-			httpResponce = client.execute(get);
+			httpResponce = client.execute(method);
 			String responceContent = getBasicHttpResponse().handleResponse(httpResponce);
 			return new HttpApiResponce(httpResponce.getStatusLine().getStatusCode(), responceContent);
 		} catch (Exception e) {
@@ -60,72 +64,78 @@ public class HttpApiClient {
 		}
 	}
 	
-	public static HttpApiResponce Post(String uri,Object content) {
+	public static HttpApiResponce Get(String uri,Map<String, String> customHeader) {
 		try {
-			return Post(new URI(uri),content);
+			return Get(new URI(uri),customHeader);
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 	}
 	
-	public static HttpApiResponce Post(URI uri,Object content) {
+	public static HttpApiResponce Get(URI uri,Map<String, String> customHeader) {
+		CloseableHttpResponse httpResponce = null;
+		HttpGet get = new HttpGet(uri);
+		
+		if(null != customHeader)
+			get.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponce, get);
+	}
+	
+	public static HttpApiResponce Post(String uri,Object content,Map<String, String> customHeader) {
+		try {
+			return Post(new URI(uri),content,customHeader);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e.getMessage(), e.getCause());
+		}
+	}
+	
+	public static HttpApiResponce Post(URI uri,Object content,Map<String, String> customHeader) {
 		CloseableHttpResponse httpResponce = null;
 		HttpPost post = new HttpPost(uri);
 		post.setEntity(getHttpEntityType(content));
-		try(CloseableHttpClient client = getCloseableHttpClient()) {
-			httpResponce = client.execute(post);
-			String responceContent = getBasicHttpResponse().handleResponse(httpResponce);
-			return new HttpApiResponce(httpResponce.getStatusLine().getStatusCode(), responceContent);
-		} catch (Exception e) {
-			if(e instanceof HttpResponseException)
-				return new HttpApiResponce(httpResponce.getStatusLine().getStatusCode(), e.getMessage());
-			throw new RuntimeException(e.getMessage(), e.getCause());
-		}
+		
+		if(null != customHeader)
+			post.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponce, post);
 	}
 	
-	public static HttpApiResponce Put(String uri,Object content) {
+	public static HttpApiResponce Put(String uri,Object content,Map<String, String> customHeader) {
 		try {
-			return Put(new URI(uri),content);
+			return Put(new URI(uri),content,customHeader);
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 	}
 	
-	public static HttpApiResponce Put(URI uri,Object content) {
+	public static HttpApiResponce Put(URI uri,Object content,Map<String, String> customHeader) {
 		CloseableHttpResponse httpResponce = null;
 		HttpPut put = new HttpPut(uri);
 		put.setEntity(getHttpEntityType(content));
-		try (CloseableHttpClient httpClient = getCloseableHttpClient()){
-			httpResponce = httpClient.execute(put);
-			String responceContent = getBasicHttpResponse().handleResponse(httpResponce);
-			return new HttpApiResponce(httpResponce.getStatusLine().getStatusCode(), responceContent);
-		} catch (Exception e) {
-			if(e instanceof HttpResponseException)
-				return new HttpApiResponce(httpResponce.getStatusLine().getStatusCode(), e.getMessage());
-			throw new RuntimeException(e.getMessage(), e.getCause());
-		}
+		
+		if(null != customHeader)
+			put.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponce, put);
 	}
 	
-	public static HttpApiResponce Delete(String uri) {
+	public static HttpApiResponce Delete(String uri,Map<String, String> customHeader) {
 		try {
-			return Delete(new URI(uri));
+			return Delete(new URI(uri),customHeader);
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e.getMessage(), e.getCause());
 		}
 	}
 	
-	public static HttpApiResponce Delete(URI uri) {
+	public static HttpApiResponce Delete(URI uri,Map<String, String> customHeader) {
 		CloseableHttpResponse httpResponce = null;
 		HttpUriRequest delete =  RequestBuilder.delete(uri).build();
-		try(CloseableHttpClient httpClient = getCloseableHttpClient()) {
-			httpResponce = httpClient.execute(delete);
-			String responceContent = getBasicHttpResponse().handleResponse(httpResponce);
-			return new HttpApiResponce(httpResponce.getStatusLine().getStatusCode(), responceContent);
-		} catch (Exception e) {
-			if(e instanceof HttpResponseException)
-				return new HttpApiResponce(httpResponce.getStatusLine().getStatusCode(), e.getMessage());
-			throw new RuntimeException(e.getMessage(), e.getCause());
-		}
+		
+		if(null != customHeader)
+			delete.setHeaders(getHeaders(customHeader));
+		
+		return performRequest(httpResponce, delete);
 	}
 
 }

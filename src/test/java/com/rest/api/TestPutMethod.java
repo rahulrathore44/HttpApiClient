@@ -18,7 +18,7 @@ public class TestPutMethod {
 				  "\"lastName\": \"LastName" + (int)(Math.random() * 100) + "\"," +
 				  "\"trusted\": false" +
 				"}";
-		HttpApiResponce responce = HttpApiClient.Put("http://localhost:8080/landlords/iCDg3eSE", jsonContent);
+		HttpApiResponce responce = HttpApiClient.Put("http://localhost:8080/landlords/iCDg3eSE", jsonContent,null);
 		System.out.println(responce.getStatusCode());
 		System.out.println(responce.getResponceContent());
 		Assert.assertTrue("Status Code is not Proper", HttpStatus.SC_OK == responce.getStatusCode() || HttpStatus.SC_NOT_FOUND == responce.getStatusCode());
