@@ -5,9 +5,12 @@ import org.apache.http.HttpStatus;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.rest.api.httpclient.HttpApiAsyncClient;
 import com.rest.api.httpclient.HttpApiClient;
 import com.rest.api.httpclient.HttpApiResponce;
+import com.rest.api.model.ResponceBody;
 
 class GetLookup extends Thread{
 	
@@ -56,6 +59,17 @@ public class TestGetMethod {
 		}
 	}
 	
+	@Test
+	public void testGetWithDeserialization() {
+		HttpApiResponce response = HttpApiAsyncClient.Get("http://localhost:8080/landlords");
+		System.out.println(response.getStatusCode());
+		System.out.println(response.getResponceContent());
+		Assert.assertEquals(HttpStatus.SC_OK, response.getStatusCode());
+		GsonBuilder builder = new GsonBuilder();
+		Gson responceBody = builder.serializeNulls().setPrettyPrinting().create();
+		ResponceBody[] output = responceBody.fromJson(response.getResponceContent(), ResponceBody[].class);
+		Assert.assertNotNull(output);
+	}
 	
 
 }
