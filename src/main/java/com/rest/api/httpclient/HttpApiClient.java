@@ -93,8 +93,9 @@ public class HttpApiClient {
 	public static HttpApiResponce Post(URI uri,Object content,Map<String, String> customHeader) {
 		CloseableHttpResponse httpResponce = null;
 		HttpPost post = new HttpPost(uri);
-		post.setEntity(getHttpEntityType(content));
-		
+
+		if(content != null)
+			post.setEntity(getHttpEntityType(content));
 		if(null != customHeader)
 			post.setHeaders(getHeaders(customHeader));
 		

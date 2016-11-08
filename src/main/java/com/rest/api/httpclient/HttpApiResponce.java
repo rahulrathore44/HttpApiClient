@@ -18,5 +18,10 @@ public class HttpApiResponce {
 		this.statusCode = statusCode;
 		this.responceContent = responceContent;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format("%1s=%2d, %3s=%4s", "Status Code",this.statusCode,"Response Content",this.responceContent);
+	}
 
 }

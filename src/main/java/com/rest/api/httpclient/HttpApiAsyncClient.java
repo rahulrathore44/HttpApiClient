@@ -50,7 +50,8 @@ public class HttpApiAsyncClient {
 		return header;
 	}
 	
-	private static HttpApiResponce performRequest(Future<HttpResponse> httpResponce,HttpUriRequest method) throws InterruptedException, ExecutionException {
+	private static HttpApiResponce performRequest(HttpUriRequest method) throws InterruptedException, ExecutionException {
+		Future<HttpResponse> httpResponce = null;
 		try(CloseableHttpAsyncClient httpClient = getHttpAsyncClient()) {
 			httpClient.start();
 			httpResponce = httpClient.execute(method, null);
@@ -72,13 +73,12 @@ public class HttpApiAsyncClient {
 	}
 	
 	public static HttpApiResponce Get(URI uri,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
-		Future<HttpResponse> httpResponce = null;
 		HttpUriRequest get = RequestBuilder.get(uri).build();
 		
 		if(customHeader != null)
 			get.setHeaders(getHeaders(customHeader));
 		
-		return performRequest(httpResponce, get);
+		return performRequest(get);
 	}
 	
 	
@@ -91,14 +91,14 @@ public class HttpApiAsyncClient {
 	}
 	
 	public static HttpApiResponce Post(URI uri,Object content,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
-		Future<HttpResponse> httpResponse = null;
 		HttpPost post = new HttpPost(uri);
-		post.setEntity(getHttpEntityType(content));
 		
 		if(customHeader != null)
 			post.setHeaders(getHeaders(customHeader));
+		if(content != null)
+			post.setEntity(getHttpEntityType(content));
 		
-		return performRequest(httpResponse, post);
+		return performRequest(post);
 	}
 	
 	public static HttpApiResponce Put(String uri,Object content,Map<String, String> customHeader) {
@@ -110,14 +110,14 @@ public class HttpApiAsyncClient {
 	}
 	
 	public static HttpApiResponce Put(URI uri,Object content,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
-		Future<HttpResponse> httpResponce = null;
 		HttpPut put = (HttpPut)RequestBuilder.put(uri).build();
-		put.setEntity(getHttpEntityType(content));
 		
 		if(customHeader != null)
 			put.setHeaders(getHeaders(customHeader));
+		if(content != null)
+			put.setEntity(getHttpEntityType(content));
 		
-		return performRequest(httpResponce, put);
+		return performRequest(put);
 		
 	}
 	
@@ -131,13 +131,13 @@ public class HttpApiAsyncClient {
 	}
 	
 	public static HttpApiResponce Delete(URI uri,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
-		Future<HttpResponse> httpResponce = null;
+		
 		HttpUriRequest delete = RequestBuilder.delete(uri).build();
 		
 		if(customHeader != null)
 			delete.setHeaders(getHeaders(customHeader));
 		
-		return performRequest(httpResponce, delete);
+		return performRequest(delete);
 	}
 
 }
