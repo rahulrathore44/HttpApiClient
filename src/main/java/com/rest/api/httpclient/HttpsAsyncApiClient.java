@@ -117,7 +117,7 @@ public class HttpsAsyncApiClient {
 	}
 	
 	public static HttpApiResponce PostWithSSl(URI uri,Object content,Map<String,String> customeHeader) throws InterruptedException, ExecutionException {
-		HttpPost post = (HttpPost) RequestBuilder.post(uri).build();
+		HttpPost post = new HttpPost(uri);
 		
 		if(customeHeader != null)
 			post.setHeaders(getHeaders(customeHeader));
@@ -137,7 +137,7 @@ public class HttpsAsyncApiClient {
 	}
 	
 	public static HttpApiResponce PutWithSSl(URI uri,Object content,Map<String,String> customeHeader) throws InterruptedException, ExecutionException {
-		HttpPut put = (HttpPut) RequestBuilder.put(uri).build();
+		HttpPut put = new HttpPut(uri);
 		
 		if(customeHeader != null)
 			put.setHeaders(getHeaders(customeHeader));

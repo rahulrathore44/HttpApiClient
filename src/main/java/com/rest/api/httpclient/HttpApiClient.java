@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -52,7 +51,8 @@ public class HttpApiClient {
 	}
 	
 	
-	private static HttpApiResponce performRequest(HttpResponse httpResponce,HttpUriRequest method){
+	private static HttpApiResponce performRequest(HttpUriRequest method){
+		CloseableHttpResponse httpResponce = null;
 		try(CloseableHttpClient client = getCloseableHttpClient()) {
 			httpResponce = client.execute(method);
 			String responceContent = getBasicHttpResponse().handleResponse(httpResponce);
@@ -73,13 +73,12 @@ public class HttpApiClient {
 	}
 	
 	public static HttpApiResponce Get(URI uri,Map<String, String> customHeader) {
-		CloseableHttpResponse httpResponce = null;
 		HttpGet get = new HttpGet(uri);
 		
 		if(null != customHeader)
 			get.setHeaders(getHeaders(customHeader));
 		
-		return performRequest(httpResponce, get);
+		return performRequest(get);
 	}
 	
 	public static HttpApiResponce Post(String uri,Object content,Map<String, String> customHeader) {
@@ -91,7 +90,6 @@ public class HttpApiClient {
 	}
 	
 	public static HttpApiResponce Post(URI uri,Object content,Map<String, String> customHeader) {
-		CloseableHttpResponse httpResponce = null;
 		HttpPost post = new HttpPost(uri);
 
 		if(content != null)
@@ -99,7 +97,7 @@ public class HttpApiClient {
 		if(null != customHeader)
 			post.setHeaders(getHeaders(customHeader));
 		
-		return performRequest(httpResponce, post);
+		return performRequest(post);
 	}
 	
 	public static HttpApiResponce Put(String uri,Object content,Map<String, String> customHeader) {
@@ -111,14 +109,14 @@ public class HttpApiClient {
 	}
 	
 	public static HttpApiResponce Put(URI uri,Object content,Map<String, String> customHeader) {
-		CloseableHttpResponse httpResponce = null;
 		HttpPut put = new HttpPut(uri);
-		put.setEntity(getHttpEntityType(content));
 		
+		if(content != null)
+			put.setEntity(getHttpEntityType(content));
 		if(null != customHeader)
 			put.setHeaders(getHeaders(customHeader));
 		
-		return performRequest(httpResponce, put);
+		return performRequest(put);
 	}
 	
 	public static HttpApiResponce Delete(String uri,Map<String, String> customHeader) {
@@ -130,13 +128,12 @@ public class HttpApiClient {
 	}
 	
 	public static HttpApiResponce Delete(URI uri,Map<String, String> customHeader) {
-		CloseableHttpResponse httpResponce = null;
 		HttpUriRequest delete =  RequestBuilder.delete(uri).build();
 		
 		if(null != customHeader)
 			delete.setHeaders(getHeaders(customHeader));
 		
-		return performRequest(httpResponce, delete);
+		return performRequest(delete);
 	}
 
 }

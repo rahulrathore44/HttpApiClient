@@ -110,7 +110,7 @@ public class HttpApiAsyncClient {
 	}
 	
 	public static HttpApiResponce Put(URI uri,Object content,Map<String, String> customHeader) throws InterruptedException, ExecutionException {
-		HttpPut put = (HttpPut)RequestBuilder.put(uri).build();
+		HttpPut put = new HttpPut(uri);
 		
 		if(customHeader != null)
 			put.setHeaders(getHeaders(customHeader));
