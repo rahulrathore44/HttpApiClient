@@ -2,6 +2,7 @@ package com.rest.api;
 
 
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.http.HttpStatus;
 import org.junit.Assert;
@@ -12,6 +13,7 @@ import com.google.gson.GsonBuilder;
 import com.rest.api.httpclient.HttpApiAsyncClient;
 import com.rest.api.httpclient.HttpApiClient;
 import com.rest.api.httpclient.HttpApiResponce;
+import com.rest.api.httpclient.HttpsAsyncApiClient;
 import com.rest.api.model.ResponceBody;
 
 class GetLookup extends Thread{
@@ -79,5 +81,16 @@ public class TestGetMethod {
 		Assert.assertNotNull(output);
 	}
 	
+	@Test
+	public void tetGetWithSSl() {
+		HttpApiResponce reponse = null;
+		try {
+			reponse = HttpsAsyncApiClient.GetWithSSl("https://www.youtube.com/", null);
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
+		System.out.println(reponse.getStatusCode());
+		System.out.println(reponse.getResponceContent());
+	}
 
 }
